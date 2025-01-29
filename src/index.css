@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+html, body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Font Classes */
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Animations */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 3s ease infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+  }
+}
+
+.animate-float {
+  animation: float 20s ease-in-out infinite;
+}
+
+/* Prose Customization */
+.prose {
+  max-width: none;
+  color: inherit;
+  font-size: 0.875rem;
+  font-size: 0.875rem;
+}
+
+.prose ul {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose ul li {
+  position: relative;
+  padding-left: 1.5em;
+  margin: 0.25em 0;
+}
+
+.prose ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: currentColor;
+  font-weight: bold;
+}
+
+.prose pre {
+  background-color: rgb(17 24 39 / 0.05);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.prose code {
+  background-color: rgb(17 24 39 / 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+}
+
+.prose blockquote {
+  border-left: 4px solid rgb(209 213 219);
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+.prose strong {
+  color: inherit;
+  font-weight: 600;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  color: inherit;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+/* Dark mode adjustments */
+.dark .prose blockquote {
+  border-left-color: rgb(75 85 99);
+}
+
+.dark .prose strong {
+  color: rgb(255 255 255);
+}
+
+.dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4 {
+  color: rgb(255 255 255);
+}
