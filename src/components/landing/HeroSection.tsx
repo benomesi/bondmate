@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-blue-50 pt-32 pb-20">

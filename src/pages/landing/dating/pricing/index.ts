@@ -38,7 +38,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     name: 'Premium',
     description: 'Unlock your full dating potential',
     price: '20',
-    priceId: 'price_0Qm6J50AEK2bx3HFt1RZW7Fd', // Replace with your Stripe Price ID
+    priceId: import.meta.env.VITE_PRICE_ID, // Replace with your Stripe Price ID
     features: [
       'Unlimited AI coach messages',
       'Advanced profile optimization',

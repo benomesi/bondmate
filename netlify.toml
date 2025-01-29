@@ -3,6 +3,7 @@
   publish = "dist"
   node_version = "20.x"
 
+  
 [[redirects]]
   from = "/*"
   to = "/index.html"

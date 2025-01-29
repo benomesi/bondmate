@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, FunctionsHttpError } from '@supabase/supabase-js';
 import type { AuthError } from '@supabase/supabase-js';
 import type { AppDispatch } from '../store/store';
 import { clearAuth } from '../store/slices/authSlice';
@@ -72,4 +72,18 @@ export function checkPasswordStrength(password: string): number {
   return PASSWORD_REQUIREMENTS.reduce((score, requirement) => {
     return score + (requirement.regex.test(password) ? 1 : 0);
   }, 0);
+}
+
+
+export async function usefullErrorMessage(error: unknown){
+    if (error instanceof FunctionsHttpError) {
+        const errorMessage = await error.context.json()
+        return errorMessage.message;
+    } 
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return 'An unknown error occurred';
 }

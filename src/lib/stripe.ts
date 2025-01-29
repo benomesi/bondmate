@@ -1,5 +1,6 @@
 import { loadStripe } from '@stripe/stripe-js';
-import { supabase } from './supabase';
+import { supabase, usefullErrorMessage } from './supabase';
+
 
 const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
@@ -23,22 +24,17 @@ export async function createSubscription(priceId: string) {
     if (!session?.access_token) {
       throw new Error('Not authenticated');
     }
-
-    const response = await fetch('/.netlify/functions/create-subscription', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`
-      },
-      body: JSON.stringify({ priceId }),
+    // call supabase function to create subscription
+    const {data, error}= await supabase.functions.invoke('create-subscription', {
+        body:JSON.stringify({priceId})
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to create subscription');
-    }
 
-    const data = await response.json();
+    if (error) {
+        const errorMessage = await usefullErrorMessage(error);
+        console.error('Subscription error:', errorMessage);
+        throw new Error(errorMessage);
+    }
     
     // Redirect to Stripe Checkout
     const { sessionId } = data;
@@ -62,22 +58,16 @@ export async function handleSubscriptionSuccess(sessionId: string) {
       throw new Error('Not authenticated');
     }
 
-    const response = await fetch('/.netlify/functions/subscription-success', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`
-      },
-      body: JSON.stringify({ sessionId }),
-    });
+    const { data, error } = await supabase.functions.invoke('subscription-success', {
+        body: JSON.stringify({ sessionId }),
+    })
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Failed to verify subscription');
+    if (error) {
+        const errorMessage = await usefullErrorMessage(error);
+        console.error('Subscription verification error:', errorMessage);
+        throw new Error(errorMessage);
     }
-
-    return await response.json();
-
+    return data;
   } catch (error) {
     console.error('Subscription verification error:', error);
     throw error;

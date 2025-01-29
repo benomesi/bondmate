@@ -6,3 +6,182 @@ Use icons from lucide-react for logos.
 
 Use stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
 
+
+IMPORTANT 
+
+Use supabase functions for thee backend
+
+
+ondMate App Documentation
+=======================
+
+Design Guidelines
+---------------
+- All designs must be beautiful, professional and production-worthy
+- No cookie-cutter templates
+- Fully featured implementations
+- Mobile responsive
+
+Tech Stack
+----------
+Frontend:
+- React with TypeScript
+- Tailwind CSS for styling
+- Lucide React for icons (default icon library)
+- Framer Motion for animations
+- Redux Toolkit for state management
+- React Router for routing
+
+Backend:
+- Supabase for:
+  - Authentication
+  - Database
+  - Row Level Security
+  - Real-time subscriptions
+
+APIs:
+- OpenAI for AI chat functionality
+- Environment variables required:
+  - VITE_OPENAI_API_KEY
+  - VITE_SUPABASE_URL
+  - VITE_SUPABASE_ANON_KEY
+
+Image Guidelines
+--------------
+- Use Unsplash for stock photos
+- Only use valid, existing URLs
+- No image downloads, only link in image tags
+
+Authentication
+-------------
+- Email/password authentication only
+- No magic links
+- No social providers
+- No SSO
+- Email confirmation disabled by default
+
+Database Guidelines
+-----------------
+- Use Supabase as default database
+- Implement Row Level Security (RLS) for all tables
+- Never skip RLS setup
+- Never use destructive operations
+- Always create new migration files for changes
+- Include comprehensive documentation in migrations
+
+Chat Features
+------------
+- AI-powered relationship coaching
+- Message limit for free users (10 messages)
+- Premium users get unlimited messages
+- Support for multiple relationship types:
+  - Romantic
+  - Family
+  - Friendship
+  - Professional
+
+User Preferences
+---------------
+- Chat preferences:
+  - Tone (empathetic, professional, casual, formal, playful)
+  - Length (concise, balanced, detailed)
+  - Style (actionable, analytical, narrative, supportive)
+- Dark/Light mode toggle
+- Relationship-specific settings
+
+Security Requirements
+-------------------
+- End-to-end encryption for messages
+- Secure data storage
+- Privacy controls
+- Regular security audits
+- No sensitive data exposure
+
+Performance Optimization
+----------------------
+- Code splitting
+- Lazy loading
+- Image optimization
+- Caching strategies
+- Bundle size optimization
+
+Deployment
+---------
+- Netlify for hosting
+- Environment variable configuration
+- Build optimization
+- Security headers
+
+Testing
+-------
+- Unit tests for critical functionality
+- Integration tests for user flows
+- End-to-end testing for key features
+- Performance testing
+
+Accessibility
+------------
+- WCAG 2.1 compliance
+- Keyboard navigation
+- Screen reader support
+- Color contrast requirements
+- Semantic HTML
+
+Error Handling
+-------------
+- Graceful error recovery
+- User-friendly error messages
+- Error boundaries
+- Logging and monitoring
+- Retry mechanisms for API calls
+
+State Management
+--------------
+- Redux for global state
+- Local state for component-specific data
+- Persistent storage for user preferences
+- Real-time sync with Supabase
+
+Code Style
+---------
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for formatting
+- Component-based architecture
+- Clean code principles
+
+Documentation
+------------
+- Code comments
+- API documentation
+- Component documentation
+- Setup instructions
+- Deployment guide
+
+Development Environment
+---------------------
+- Node.js
+- npm/yarn
+- TypeScript
+- VS Code recommended
+- Git for version control
+
+Project Structure
+---------------
+/src
+  /components     # React components
+  /hooks          # Custom hooks
+  /lib           # Utility functions
+  /pages         # Route components
+  /services      # API services
+  /store         # Redux store
+  /types         # TypeScript types
+  /styles        # Global styles
+
+/supabase
+  /function      #supabase function
+  /migrations   # supabase db migrations
+
+/public          # Static assets
+/docs           # Documentation
+/tests          # Test files

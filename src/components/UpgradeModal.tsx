@@ -105,7 +105,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           {/* Action Buttons */}
           <div className="space-y-3">
             <button
-              onClick={() => handleUpgrade('price_0Qm6J50AEK2bx3HFt1RZW7Fd')}
+              onClick={() => handleUpgrade(import.meta.env.VITE_PRICE_ID)}
               disabled={isLoading}
               className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:opacity-90 transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
