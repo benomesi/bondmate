@@ -136,8 +136,7 @@ export function Dashboard() {
         relationship={editingRelationship}
       />
       <UpgradeModal
-        // isOpen={isUpgradeModalOpen}
-        isOpen={true}
+        isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
       />
 

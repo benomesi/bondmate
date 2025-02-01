@@ -139,3 +139,7 @@ html, body {
 .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4 {
   color: rgb(255 255 255);
 }
+
+.debug{
+    outline: 1px solid red;
+}

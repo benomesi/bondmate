@@ -1,4 +1,3 @@
-import React from 'react';
 import { Crown, MessageSquare } from 'lucide-react';
 import { ChatMessages } from '../ChatMessages';
 import { ChatInput } from '../ChatInput';

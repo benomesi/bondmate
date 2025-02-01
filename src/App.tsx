@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard';
-import { Dashboard } from './components/Dashboard';
+// import { Dashboard } from './components/Dashboard';
 import { LandingPage } from './pages/LandingPage';
 import { BlogPage } from './pages/BlogPage';
 import { BlogPostPage } from './pages/BlogPostPage';
@@ -18,17 +18,22 @@ import { SignInPage } from './pages/auth/SignInPage';
 import { SignUpPage } from './pages/auth/SignUpPage';
 import { SubscriptionSuccess } from './components/SubscriptionSuccess';
 import { useAppSelector } from './hooks/useAppSelector';
+import Dashboard from './components/dashboard_v2/Dashboard';
+// import { Dashboard } from './components/Dashboard';
+
 
 export default function App() {
-  const { hasCompletedOnboarding } = useAppSelector((state) => state.app);
+//   const { hasCompletedOnboarding } = useAppSelector((state) => state.app);
   const { user } = useAppSelector((state) => state.auth);
-
+  const {pathname} = useLocation()
+console.log(pathname)
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white">
         <Header />
-        <main className="pt-16">
+        <main className={pathname.includes('/dashboard') ? "": "pt-16"}>
           <Routes>
+            
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/blog" element={<BlogPage />} />
@@ -67,9 +72,18 @@ export default function App() {
               path="/dashboard/*"
               element={
                 <ProtectedRoute>
-                  {hasCompletedOnboarding ? <Dashboard /> : <OnboardingWizard />}
+                  <Dashboard />
                 </ProtectedRoute>
               }
+            />
+
+            <Route
+                path='/dashboard/bonding/onboarding'
+                element={
+                    <ProtectedRoute>
+                        <OnboardingWizard />
+                    </ProtectedRoute>
+                }
             />
 
             {/* Fallback route */}
@@ -82,14 +96,16 @@ export default function App() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, isLoading } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
+  if (isLoading) {
+    return <div/>; // You can replace this with a proper loading spinner or component
+  }
 
   if (!user) {
     return <Navigate to="/auth/sign-in" state={{ from: location }} replace />;
   }
-
 
   return <>{children}</>;
 }

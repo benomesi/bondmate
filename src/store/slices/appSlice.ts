@@ -37,7 +37,7 @@ const initialState: AppState = {
   }
 };
 
-const FREE_MESSAGE_LIMIT = 10;
+// const FREE_MESSAGE_LIMIT = 10;
 
 export const appSlice = createSlice({
   name: 'app',
