@@ -6,9 +6,6 @@ import { trackMessage } from '../../../lib/analytics';
 import { PreferencesModal } from '../../PreferencesModal';
 import { UpgradeModal } from '../../UpgradeModal';
 
-
-
-
 export function ChatInput({ relationshipId }: { relationshipId: string }) {
     const [input, setInput] = useState('');
     const [textareaHeight, setTextareaHeight] = useState('auto');
@@ -17,6 +14,7 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
     const { sendMessage, isSubmitting } = useChat(relationshipId);
     const { isPremium, messageCount } = useAppSelector((state) => state.app);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+
     const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const textarea = e.target;
         setInput(textarea.value);
@@ -42,22 +40,21 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
             }
-            autoScrollPageBottom();
         } catch (error) {
             console.error('Failed to send message:', error);
         }
     };
 
-    const autoScrollPageBottom = useCallback(() => {
-        window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: 'smooth'
-        });
-    }, []);
-
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+        }
+    };
 
     const isDisabled = isSubmitting || (!isPremium && messageCount >= 10);
     const premiumRequired = !isPremium && messageCount >= 10;
+
     return (
         <>
             <PreferencesModal 
@@ -68,27 +65,10 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
                 isOpen={isUpgradeModalOpen}
                 onClose={() => setIsUpgradeModalOpen(false)}
             />
-            <div className="p-4 bottom-0 z-[10] fixed  md:w-[70%] md:right-[39%] transform translate-x-1/2 w-[100%] right-[50%]">
-               
-                <div className='border border-gray-300 rounded-xl p-4 bg-white'>
-
-                    <textarea
-                            ref={textareaRef}
-                            value={input}
-                            rows={1}
-                            onChange={handleTextareaChange}
-                            placeholder={isDisabled ? "Upgrade to continue chatting" : "Type your message..."}
-                            disabled={isDisabled}
-                            className="w-full p-3 border-none rounded-lg resize-none focus:outline-none focus:ring-0 disabled:opacity-50 disabled:cursor-not-allowed font-inter transition-all duration-200 bg-white text-gray-900"
-                            style={{
-                                height: textareaHeight,
-                                minHeight: '14px',
-                                maxHeight: '120px'
-                            }}
-                    />
-
-                    <div className='flex justify-between space-x-4 items-center'>
-                        <div className='flex items-center space-x-3'>
+            <div className="fixed bottom-0 md:left-[25%] right-0 bg-white border-t border-gray-200 chat-container">
+                <div className="max-w-4xl mx-auto px-4 py-4">
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setShowPreferences(true)}
                                 className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90 transition-colors"
@@ -98,34 +78,44 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
                                 <span className="text-sm hidden sm:inline">Customize AI</span>
                             </button>
                             {premiumRequired && (
-                              <button
-                                onClick={() => setIsUpgradeModalOpen(true)}
-                                className='flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90 transition-colors animate-pulse'
+                                <button
+                                    onClick={() => setIsUpgradeModalOpen(true)}
+                                    className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90 transition-colors animate-pulse"
                                 >
-                                <Crown className="w-5 h-5 text-yellow-400"
-                                />
-                                <span className="text-sm hidden sm:inline">Upgrade Now</span>
-                            </button>
+                                    <Crown className="w-5 h-5 text-yellow-400" />
+                                    <span className="text-sm hidden sm:inline">Upgrade Now</span>
+                                </button>
                             )}
                         </div>
-                        
-                        <button
-                            type="submit"
-                            onClick={handleSubmit}
-                            disabled={!input.trim() || isSubmitting}
-                            className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {
-                                isSubmitting ?
-                                   <LoaderPinwheel className='w-5 h-5 animate-spin'/>
-                                   : <Send className="w-5 h-5" />
-                            }
-                            
-                        </button>
+
+                        <div className="flex-1 relative">
+                            <textarea
+                                ref={textareaRef}
+                                value={input}
+                                onChange={handleTextareaChange}
+                                onKeyDown={handleKeyDown}
+                                placeholder={isDisabled ? "Upgrade to continue chatting" : "Type your message..."}
+                                disabled={isDisabled}
+                                className="w-full p-3 pr-12 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-inter transition-all duration-200 bg-white text-gray-900"
+                                style={{
+                                    height: textareaHeight,
+                                    minHeight: '24px',
+                                    maxHeight: '120px'
+                                }}
+                            />
+                            <button
+                                onClick={handleSubmit}
+                                disabled={!input.trim() || isSubmitting}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 
+                                    <LoaderPinwheel className="w-5 h-5 animate-spin"/> : 
+                                    <Send className="w-5 h-5" />
+                                }
+                            </button>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
         </>
     );

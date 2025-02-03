@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { X, Plus } from 'lucide-react';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { useAppSelector } from '../hooks/useAppSelector';
-import { addRelationship, updateRelationship } from '../store/slices/appSlice';
+import { addRelationship, updateRelationship, setError } from '../store/slices/appSlice';
 import { relationshipService } from '../services/relationships';
 import { RelationshipWizard } from './RelationshipWizard';
 import type { Relationship, RelationType } from '../types';
@@ -77,7 +78,7 @@ export function RelationshipModal({ isOpen, onClose, relationship }: Relationshi
         // Create new relationship
         const { relationship: newRelationship, error } = await relationshipService.createRelationship(
           user.id,
-          formData
+          formData as Omit<Relationship, 'id'>
         );
         if (error) throw error;
         if (newRelationship) {
@@ -87,6 +88,7 @@ export function RelationshipModal({ isOpen, onClose, relationship }: Relationshi
       onClose();
     } catch (error) {
       console.error('Failed to save relationship:', error);
+      dispatch(setError('Failed to save relationship. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -130,182 +132,202 @@ export function RelationshipModal({ isOpen, onClose, relationship }: Relationshi
 
   // For new relationships, show the wizard
   if (!relationship) {
-    return <RelationshipWizard onClose={onClose} />;
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isOpen ? 1 : 0 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100]"
+      >
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <div className="absolute inset-0 flex items-center justify-center p-4">
+          <RelationshipWizard onClose={onClose} />
+        </div>
+      </motion.div>
+    );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
-            {relationship ? 'Edit Relationship' : 'Add New Relationship'}
-          </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X className="w-5 h-5" />
-          </button>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isOpen ? 1 : 0 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100]"
+    >
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden relative z-[101]">
+          <div className="flex justify-between items-center p-4 border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">
+              {relationship ? 'Edit Relationship' : 'Add New Relationship'}
+            </h2>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-8rem)]">
+            <div className="p-4 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Relationship Type
+                </label>
+                <select
+                  value={formData.type || 'friendship'}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as RelationType })}
+                  className="w-full p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="romantic">Romantic</option>
+                  <option value="family">Family</option>
+                  <option value="friendship">Friendship</option>
+                  <option value="professional">Professional</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Shared Interests
+                </label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {SUGGESTED_INTERESTS.map((interest) => (
+                    <button
+                      key={interest}
+                      type="button"
+                      onClick={() => toggleInterest(interest)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
+                        ${formData.interests?.includes(interest)
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                    >
+                      {interest}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customInterest}
+                    onChange={(e) => setCustomInterest(e.target.value)}
+                    placeholder="Add custom interest"
+                    className="flex-1 p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomInterest}
+                    className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Relationship Goals
+                </label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {SUGGESTED_GOALS.map((goal) => (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() => toggleGoal(goal)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
+                        ${formData.goals?.includes(goal)
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customGoal}
+                    onChange={(e) => setCustomGoal(e.target.value)}
+                    placeholder="Add custom goal"
+                    className="flex-1 p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomGoal}
+                    className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Their Communication Style
+                </label>
+                <div className="space-y-2">
+                  {COMMUNICATION_STYLES.map(({ value, label }) => (
+                    <label
+                      key={value}
+                      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200
+                        ${formData.communicationStyle === value
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
+                          : 'bg-gray-50 hover:bg-gray-100'
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        name="communicationStyle"
+                        value={value}
+                        checked={formData.communicationStyle === value}
+                        onChange={(e) => setFormData({ ...formData, communicationStyle: e.target.value })}
+                        className="hidden"
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200">
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={onClose}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
+                >
+                  {isSubmitting 
+                    ? (relationship ? 'Saving...' : 'Adding...')
+                    : (relationship ? 'Save Changes' : 'Add Relationship')
+                  }
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
-        
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(90vh-8rem)]">
-          <div className="p-4 space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Relationship Type
-              </label>
-              <select
-                value={formData.type || 'friendship'}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as RelationType })}
-                className="w-full p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="romantic">Romantic</option>
-                <option value="family">Family</option>
-                <option value="friendship">Friendship</option>
-                <option value="professional">Professional</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Shared Interests
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {SUGGESTED_INTERESTS.map((interest) => (
-                  <button
-                    key={interest}
-                    type="button"
-                    onClick={() => toggleInterest(interest)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
-                      ${formData.interests?.includes(interest)
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    {interest}
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customInterest}
-                  onChange={(e) => setCustomInterest(e.target.value)}
-                  placeholder="Add custom interest"
-                  className="flex-1 p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button
-                  type="button"
-                  onClick={addCustomInterest}
-                  className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Relationship Goals
-              </label>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {SUGGESTED_GOALS.map((goal) => (
-                  <button
-                    key={goal}
-                    type="button"
-                    onClick={() => toggleGoal(goal)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200
-                      ${formData.goals?.includes(goal)
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    {goal}
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customGoal}
-                  onChange={(e) => setCustomGoal(e.target.value)}
-                  placeholder="Add custom goal"
-                  className="flex-1 p-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-                <button
-                  type="button"
-                  onClick={addCustomGoal}
-                  className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Their Communication Style
-              </label>
-              <div className="space-y-2">
-                {COMMUNICATION_STYLES.map(({ value, label }) => (
-                  <label
-                    key={value}
-                    className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200
-                      ${formData.communicationStyle === value
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                      }`}
-                  >
-                    <input
-                      type="radio"
-                      name="communicationStyle"
-                      value={value}
-                      checked={formData.communicationStyle === value}
-                      onChange={(e) => setFormData({ ...formData, communicationStyle: e.target.value })}
-                      className="hidden"
-                    />
-                    <span>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="sticky bottom-0 bg-white p-4 border-t border-gray-200">
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
-              >
-                {isSubmitting 
-                  ? (relationship ? 'Saving...' : 'Adding...')
-                  : (relationship ? 'Save Changes' : 'Add Relationship')
-                }
-              </button>
-            </div>
-          </div>
-        </form>
       </div>
-    </div>
+    </motion.div>
   );
 }

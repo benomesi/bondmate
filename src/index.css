@@ -27,6 +27,38 @@ html, body {
   font-family: 'Inter', sans-serif;
 }
 
+/* Z-index Layers */
+.z-layers {
+  /* Base layers */
+  --z-background: 0;
+  --z-content: 1;
+  --z-header: 10;
+  --z-sidebar: 20;
+  --z-chat: 30;
+  --z-dropdown: 40;
+  --z-modal-backdrop: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm;
+  z-index: var(--z-modal-backdrop);
+}
+
+/* Modal container */
+.modal-container {
+  @apply fixed inset-0 flex items-center justify-center p-4;
+  z-index: var(--z-modal);
+}
+
+/* Chat container */
+.chat-container {
+  z-index: var(--z-chat);
+}
+
 /* Animations */
 @keyframes gradient {
   0% {
@@ -62,7 +94,6 @@ html, body {
 .prose {
   max-width: none;
   color: inherit;
-  font-size: 0.875rem;
   font-size: 0.875rem;
 }
 
@@ -138,8 +169,4 @@ html, body {
 
 .dark .prose h1, .dark .prose h2, .dark .prose h3, .dark .prose h4 {
   color: rgb(255 255 255);
-}
-
-.debug{
-    outline: 1px solid red;
 }

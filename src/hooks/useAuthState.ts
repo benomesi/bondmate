@@ -52,13 +52,13 @@ export function useAuthState() {
               if (newProfile && isSubscribed) {
                 dispatch(setProfile({
                   name: newProfile.name,
-                  is_admin: newProfile.is_admin,
-                  is_premium: newProfile.is_premium,
-                  interests: newProfile.interests,
-                  goals: newProfile.goals
+                  is_admin: newProfile.is_admin || false,
+                  is_premium: newProfile.is_premium || false,
+                  interests: newProfile.interests || [],
+                  goals: newProfile.goals || []
                 }));
-                dispatch(setHasCompletedOnboarding(newProfile.has_completed_onboarding));
-                dispatch(setPremium(newProfile.is_premium));
+                dispatch(setHasCompletedOnboarding(newProfile.has_completed_onboarding || false));
+                dispatch(setPremium(newProfile.is_premium || false));
               }
             } else {
               throw profileError;
@@ -66,13 +66,13 @@ export function useAuthState() {
           } else if (profile && isSubscribed) {
             dispatch(setProfile({
               name: profile.name,
-              is_admin: profile.is_admin,
-              is_premium: profile.is_premium,
-              interests: profile.interests,
-              goals: profile.goals
+              is_admin: profile.is_admin || false,
+              is_premium: profile.is_premium || false,
+              interests: profile.interests || [],
+              goals: profile.goals || []
             }));
-            dispatch(setHasCompletedOnboarding(profile.has_completed_onboarding));
-            dispatch(setPremium(profile.is_premium));
+            dispatch(setHasCompletedOnboarding(profile.has_completed_onboarding || false));
+            dispatch(setPremium(profile.is_premium || false));
           }
 
           // Fetch relationships and messages
@@ -139,9 +139,11 @@ export function useAuthState() {
     initAuth();
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         dispatch(setUser(session.user));
+        // Re-initialize data when auth state changes
+        initAuth();
       } else {
         dispatch(clearAuth());
       }
