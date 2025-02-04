@@ -23,9 +23,9 @@ export default function ChatArea() {
     }
 
     return (
-        <div className="relative flex-1 flex flex-col min-h-0">
+        <div className="relative flex-1 flex flex-col">
             {/* Chat Header */}
-            <div className="p-4 md:px-8 md:p-6 border-b bg-white/95 border-gray-200 backdrop-blur-sm sticky top-0 z-10">
+            <div className="p-4 md:px-8 md:p-6 border-b bg-white/95 border-gray-200 backdrop-blur-sm sticky top-0 z-[1]">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">                    
                     <div className='space-y-3'>
                         <h2 className="text-2xl font-medium text-gray-900">

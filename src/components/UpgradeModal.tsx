@@ -62,7 +62,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden">
+      <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden max-h-[80%] md:max-h-[100%] overflow-y-auto">
         {/* Header */}
         <div className="relative bg-gradient-to-r from-blue-500 to-indigo-500 p-6 text-white">
           <button
@@ -73,7 +73,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           </button>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Crown className="w-8 h-8" />
-            <h2 className="text-2xl font-bold">Upgrade to Premium</h2>
+            <h2 className="text-lg md:text-lg-2xl font-bold">Upgrade to Premium</h2>
           </div>
           <p className="text-center text-white/90">
             Unlock unlimited access to BondMate's powerful features

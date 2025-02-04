@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { encryptMessage, decryptMessage } from '../lib/encryption';
 import { messageService } from './messages';
-import { getChatResponse, OpenAIError } from '../lib/openai';
 import { relationshipService } from './relationships';
 import type { Message, Relationship, User, ChatPreferences } from '../types';
 
@@ -23,12 +22,6 @@ export class ChatService {
   private messageQueue: Map<string, Promise<any>> = new Map();
   private readonly MAX_RETRIES = 3;
   private readonly RETRY_DELAYS = [1000, 2000, 4000];
-  private readonly RETRYABLE_ERROR_CODES = new Set([
-    'rate_limit_exceeded', 
-    'service_error', 
-    'unknown_error',
-    'timeout_error'
-  ]);
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
     const timeoutPromise = new Promise<T>((_, reject) => {
@@ -103,52 +96,33 @@ export class ChatService {
         });
 
         try {
-          // Get AI response with retries
-          let retries = 0;
-          let lastError: Error | null = null;
+          // Call Supabase Edge Function
+          const { data, error } = await supabase.functions.invoke('chat', {
+            body: JSON.stringify({
+              messages: formattedMessages,
+              context: relationship,
+              preferences,
+              messageCount,
+              isPremium
+            })
+          });
 
-          while (retries < this.MAX_RETRIES) {
-            try {
-              const aiResponse = await this.withTimeout(getChatResponse(
-                formattedMessages,
-                relationship,
-                user,
-                preferences,
-                messageCount,
-                isPremium
-              ));
+          if (error) throw error;
+          if (!data?.message) throw new Error('No response from AI');
 
-              if (!aiResponse) {
-                throw new ChatServiceError('No response from AI', 'no_ai_response');
-              }
+          // Save AI response
+          const { message: aiMessage, error: aiMessageError } = await this.messageService.createMessage(
+            relationshipId,
+            data.message,
+            true
+          );
 
-              // Save AI response
-              const { message: aiMessage, error: aiMessageError } = await this.messageService.createMessage(
-                relationshipId,
-                aiResponse,
-                true
-              );
-
-              if (aiMessageError) throw aiMessageError;
-              if (!aiMessage) {
-                throw new ChatServiceError('Failed to create AI message', 'message_creation_failed');
-              }
-
-              return { userMessage, aiResponse: aiMessage, error: null };
-
-            } catch (err) {
-              lastError = err as Error;
-              
-              if (this.RETRYABLE_ERROR_CODES.has((err as ChatServiceError).code) && retries < this.MAX_RETRIES) {
-                retries++;
-                await new Promise(resolve => setTimeout(resolve, this.RETRY_DELAYS[retries - 1]));
-                continue;
-              }
-              throw err;
-            }
+          if (aiMessageError) throw aiMessageError;
+          if (!aiMessage) {
+            throw new ChatServiceError('Failed to create AI message', 'message_creation_failed');
           }
 
-          throw lastError || new Error('Max retries exceeded');
+          return { userMessage, aiResponse: aiMessage, error: null };
 
         } catch (error) {
           throw error;

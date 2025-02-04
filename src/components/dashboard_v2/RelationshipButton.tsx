@@ -9,9 +9,10 @@ import { relationshipService } from "../../services/relationships";
 
 interface RelationshipButtonProps {
     relationship: Relationship;
+    setShowMobileSideBar?: (show: boolean) => void;
 }
 
-export const RelationshipButton = ({ relationship }: RelationshipButtonProps) => {
+export const RelationshipButton = ({ relationship, setShowMobileSideBar }: RelationshipButtonProps) => {
     const { name } = relationship;
     const dispatch = useAppDispatch();
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -19,6 +20,10 @@ export const RelationshipButton = ({ relationship }: RelationshipButtonProps) =>
     
     const handleRelationshipClick = () => {
         dispatch(setSelectedRelationship(relationship));
+        // Only call setShowMobileSideBar if it exists
+        if (setShowMobileSideBar) {
+            setShowMobileSideBar(false);
+        }
     };
 
     const handleDelete = async () => {
