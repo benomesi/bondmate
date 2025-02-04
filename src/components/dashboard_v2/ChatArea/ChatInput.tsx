@@ -65,10 +65,10 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
                 isOpen={isUpgradeModalOpen}
                 onClose={() => setIsUpgradeModalOpen(false)}
             />
-            <div className="fixed bottom-0 md:left-[25%] right-0 bg-white border-t border-gray-200 chat-container">
+            <div className="fixed bottom-0 md:left-[25%] right-0 bg-white border-t border-gray-200 chat-container w-screen md:w-auto -z-[10]">
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-col ">
                             <button
                                 onClick={() => setShowPreferences(true)}
                                 className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90 transition-colors"

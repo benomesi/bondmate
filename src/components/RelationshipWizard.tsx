@@ -174,15 +174,15 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/50">
+    <div className="absolute inset-0 flex items-center justify-center md:p-4 p-3 bg-black/50 z-[9999]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-2xl bg-white rounded-2xl shadow-xl relative z-[60]"
+        className="w-full max-w-2xl  rounded-2xl shadow-xl relative max-h-[90%] md:max-h-[100%] overflow-y-auto bg-white"
       >
         {/* Progress Bar */}
-        <div className="p-6 border-b border-gray-200 bg-white rounded-t-2xl">
+        <div className="p-6 border-b border-gray-200  rounded-t-2xl">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600">
               {step === 1 ? 'Welcome' : `Step ${step - 1} of 3`}
@@ -206,7 +206,7 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
         )}
 
         {/* Content Area */}
-        <div className="p-6 bg-white">
+        <div className="p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}

@@ -6,6 +6,8 @@ import { RelationshipButton } from './RelationshipButton';
 import RemainingMessages from './RemainingMessages';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import { RelationshipModal } from '../RelationshipModal';
+import { Menu } from 'lucide-react';
+import { X } from 'lucide-react';
 
 type RelationshipGroup = {
     [key: string]: {
@@ -52,7 +54,12 @@ export const SideBar = () => {
     return (
         <>
             {showMobileSideBar ? (
-                <MobileSideBar setShowMobileSideBar={setShowMobileSideBar} />
+                <MobileSideBar 
+                    setShowMobileSideBar={setShowMobileSideBar} 
+                    groupedRelationships={groupedRelationships}
+                    isPremium={isPremium}
+                    onAddRelationship={() => setIsRelationshipModalOpen(true)}  
+                />
             ) : (
                 <DesktopSideBar 
                     setShowMobileSideBar={setShowMobileSideBar}
@@ -72,16 +79,61 @@ export const SideBar = () => {
 
 const MobileSideBar = ({
     setShowMobileSideBar,
+    groupedRelationships,
+    isPremium,
+    onAddRelationship
 }: {
     setShowMobileSideBar: (show: boolean) => void;
+    groupedRelationships: RelationshipGroup;
+    isPremium: boolean;
+    onAddRelationship: () => void;
+
 }) => {
+
+    
     return (
         <div className="min-w-screen min-h-screen z-50 backdrop-blur-md fixed left-0 top-0 flex backdrop:bg-black backdrop-brightness-50">
             <div className="w-[80vw] bg-white p-6 flex flex-col space-y-3">
                 <div className="flex-1">
                     <SiteLogo />
-                    <div>
-                        <Navigation />
+                <div>
+                    {!isPremium && <RemainingMessages />}
+                
+                <div className="space-y-6 mt-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-sm font-semibold text-gray-500">
+                            YOUR RELATIONSHIPS
+                        </h2>
+                        <button
+                            onClick={onAddRelationship}
+                            className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90 transition-colors"
+                            title="Add new relationship"
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    {Object.entries(groupedRelationships).map(([type, group]) => (
+                        <div key={type} className="space-y-2">
+                            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                {group.label}
+                            </h3>
+                            {group.relationships.map((relationship) => (
+                                <RelationshipButton
+                                    key={relationship.id}
+                                    relationship={relationship}
+                                    setShowMobileSideBar={setShowMobileSideBar}
+                                />
+                            ))}
+                        </div>
+                    ))}
+
+                    {Object.keys(groupedRelationships).length === 0 && (
+                        <div className="text-center text-gray-500 py-4">
+                            No relationships yet. Click the + button to add one!
+                        </div>
+                    )}
+                </div> 
                     </div>
                 </div>
                 <AuthUserDetails />
@@ -91,12 +143,7 @@ const MobileSideBar = ({
                 className="w-[20vw] flex justify-end items-start p-6"
             >
                 <button onClick={() => setShowMobileSideBar(false)}>
-                    <img
-                        src="/icons/x-close.svg"
-                        width={24}
-                        height={24}
-                        alt="Close"
-                    />
+                   <X />
                 </button>
             </div>
         </div>
@@ -122,12 +169,7 @@ const DesktopSideBar = ({
                     onClick={() => setShowMobileSideBar(true)}
                     className="md:hidden"
                 >
-                    <img
-                        src="/icons/menu-02.svg"
-                        width={24}
-                        height={24}
-                        alt="open sidebar"
-                    />
+                   <Menu />
                 </button>
             </div>
 
