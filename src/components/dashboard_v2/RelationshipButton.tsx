@@ -20,10 +20,7 @@ export const RelationshipButton = ({ relationship, setShowMobileSideBar }: Relat
     
     const handleRelationshipClick = () => {
         dispatch(setSelectedRelationship(relationship));
-        // Only call setShowMobileSideBar if it exists
-        if (setShowMobileSideBar) {
-            setShowMobileSideBar(false);
-        }
+        setShowMobileSideBar(false);
     };
 
     const handleDelete = async () => {
