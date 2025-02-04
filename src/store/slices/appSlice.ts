@@ -15,6 +15,7 @@ interface AppState {
   hasCompletedOnboarding: boolean;
   quizResults: QuizResults | null;
   chatPreferences: ChatPreferences;
+  temporaryMessage?: Message;
 }
 
 const initialState: AppState = {
@@ -34,7 +35,8 @@ const initialState: AppState = {
     tone: 'empathetic' as const,
     length: 'concise' as const,
     style: 'supportive' as const
-  }
+  },
+  temporaryMessage: undefined
 };
 
 // const FREE_MESSAGE_LIMIT = 10;
@@ -136,8 +138,11 @@ export const appSlice = createSlice({
     },
     setChatPreferences: (state, action: PayloadAction<ChatPreferences>) => {
       state.chatPreferences = action.payload;
+    },
+    setTemporaryMessage: (state, action: PayloadAction<Message | undefined>) => {
+      state.temporaryMessage = action.payload;
     }
-  }
+}
 });
 
 export const {
@@ -156,7 +161,8 @@ export const {
   setPremium,
   setHasCompletedOnboarding,
   setQuizResults,
-  setChatPreferences
+  setChatPreferences,
+    setTemporaryMessage
 } = appSlice.actions;
 
 export default appSlice.reducer;

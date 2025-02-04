@@ -30,7 +30,7 @@ export const AuthUserDetails = () => {
 
     return (
         <>
-            <div className="flex items-start justify-between space-x-3 p-1 py-6 border-t border-[#EAECF0] md:w-[110%] lg:w-full">
+            <div className="flex items-start justify-between space-x-3 p-1 py-6 border-t border-[#EAECF0] md:w-[100%] lg:w-full">
                 <div 
                     className='space-y-3 cursor-pointer hover:opacity-80 transition-opacity'
                     onClick={() => setIsProfileModalOpen(true)}

@@ -173,10 +173,10 @@ const DesktopSideBar = ({
                 </button>
             </div>
 
-            <div className="hidden md:block">
+            <div className="hidden md:block max-h-[80%] overflow-y-auto">
                 {!isPremium && <RemainingMessages />}
                 
-                <div className="space-y-6 mt-6">
+                <div className="space-y-6 mt-6 py-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-sm font-semibold text-gray-500">
                             YOUR RELATIONSHIPS
@@ -199,10 +199,14 @@ const DesktopSideBar = ({
                                 <RelationshipButton
                                     key={relationship.id}
                                     relationship={relationship}
+                                    setShowMobileSideBar={setShowMobileSideBar}
                                 />
                             ))}
                         </div>
                     ))}
+                      
+
+
 
                     {Object.keys(groupedRelationships).length === 0 && (
                         <div className="text-center text-gray-500 py-4">

@@ -7,13 +7,13 @@ function Layout({children}:{
     children: React.ReactNode
 }) {
     return (
-        <div className="md:grid md:grid-cols-12 font-inter min-h-screen">
-            <div className="md:col-span-4 lg:col-span-3 md:pl-6 md:border-r relative z-10">
-                <div className="md:fixed md:left-0 md:h-screen lg:w-[25%]">
+        <div className="flex flex-col md:flex-row font-inter min-h-screen">
+            <div className="md:col-span-4 md:border-r z-10 md:w-[35%] lg:w-[25%] relative">
+                <div className="md:h-screen fixed md:sticky top-0 z-10 bg-white border-r border-gray-200 w-full">
                     <SideBar />
                 </div>
             </div>
-            <div className="md:col-span-8 lg:col-span-9 flex flex-col">
+            <div className="flex flex-col flex-1">
                 {children}
             </div>
         </div>

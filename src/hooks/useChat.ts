@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useAppDispatch } from './useAppDispatch';
 import { useAppSelector } from './useAppSelector';
-import { addMessage, editMessage, setLoading, setError, setTyping } from '../store/slices/appSlice';
+import { addMessage, setLoading, setError, setTyping, setTemporaryMessage } from '../store/slices/appSlice';
 import { chatService, ChatServiceError } from '../services/chat';
+import { u } from 'framer-motion/client';
 
 export function useChat(relationshipId: string) {
   const dispatch = useAppDispatch();
@@ -14,7 +15,7 @@ export function useChat(relationshipId: string) {
     isPremium,
     error: existingError
   } = useAppSelector((state) => state.app);
-  const { user } = useAppSelector((state) => state.auth);
+//   const { user } = useAppSelector((state) => state.auth);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sendMessage = useCallback(async (content: string) => {
@@ -36,19 +37,22 @@ export function useChat(relationshipId: string) {
     }
 
     setIsSubmitting(true);
-    dispatch(setLoading(true));
+    // dispatch(setLoading(true));
     dispatch(setTyping(true));
-
+    dispatch(setTemporaryMessage(undefined))
     try {
-      const { userMessage, aiResponse, error } = await chatService.sendMessage(
+      const { userMessage, dataStream, error } = await chatService.sendMessage(
         relationshipId,
         content,
         selectedRelationship,
-        user,
         chatPreferences,
         messageCount,
         isPremium
       );
+
+
+
+
 
       if (error) throw error;
 
@@ -56,6 +60,58 @@ export function useChat(relationshipId: string) {
         dispatch(addMessage({ relationshipId, message: userMessage }));
       }
       
+        // Handle AI response
+
+      const reader = dataStream?.body?.getReader();
+      const decoder = new TextDecoder('utf-8');
+        
+
+    let receivedText = "";
+        async function readStream() {  
+        while (true) {
+                if (!reader) break;
+              const { done, value } = await reader.read();
+              if (done) {
+                dispatch(setTemporaryMessage(undefined));        
+                break;
+            }
+          
+              const chunk = decoder.decode(value, { stream: true }).trim();
+          
+              // Split multiple JSON objects if they exist
+              const lines = chunk.split("\n"); 
+          
+              for (const line of lines) {
+                if (line.startsWith("data:")) {
+                  try {
+                    const jsonString = line.replace("data: ", "").trim();
+                    
+                    if (jsonString !== "[DONE]") { // Ignore termination signal
+                      const parsedChunk = JSON.parse(jsonString);
+                      const content = parsedChunk?.choices?.[0]?.delta?.content || "";
+          
+                      if (content) {
+                        receivedText += content;
+                        dispatch(setTemporaryMessage({ id: 'temp', content: receivedText, timestamp: new Date().toISOString(), isAI: true }));
+                      }
+                    }
+                  } catch (error) {
+                    console.error("Error parsing chunk:", error, line);
+                  }
+                }
+              }
+            }
+          }
+          await readStream();
+
+          const { message: aiMessage, error: aiMessageError } = await chatService.messageService.createMessage(
+            relationshipId,
+            receivedText,
+            true
+          );
+        if (aiMessageError) throw aiMessageError;
+        const aiResponse = aiMessage;
+
       if (aiResponse) {
         dispatch(addMessage({ relationshipId, message: aiResponse }));
       }
@@ -80,6 +136,14 @@ export function useChat(relationshipId: string) {
             errorMessage = error.message;
         }
       }
+      dispatch(
+        setTemporaryMessage({
+            id: 'error',
+            content: errorMessage,
+            timestamp: new Date().toISOString(),
+            isAI: true
+        })
+      )
       
       dispatch(setError(errorMessage));
     } finally {
@@ -87,7 +151,7 @@ export function useChat(relationshipId: string) {
       dispatch(setLoading(false));
       dispatch(setTyping(false));
     }
-  }, [relationshipId, selectedRelationship, user, chatPreferences, messageCount, isPremium, existingError, dispatch]);
+  }, [relationshipId, selectedRelationship,chatPreferences, messageCount, isPremium, existingError, dispatch]);
 
   return {
     sendMessage,

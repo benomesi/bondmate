@@ -20,6 +20,7 @@ export const RelationshipButton = ({ relationship, setShowMobileSideBar }: Relat
     
     const handleRelationshipClick = () => {
         dispatch(setSelectedRelationship(relationship));
+        if(!setShowMobileSideBar) return;
         setShowMobileSideBar(false);
     };
 

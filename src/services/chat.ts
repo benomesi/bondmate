@@ -1,8 +1,10 @@
 import { supabase } from '../lib/supabase';
-import { encryptMessage, decryptMessage } from '../lib/encryption';
+import { encryptMessage,} from '../lib/encryption';
 import { messageService } from './messages';
-import { relationshipService } from './relationships';
-import type { Message, Relationship, User, ChatPreferences } from '../types';
+// import { relationshipService } from './relationships';
+import type { Message, Relationship, ChatPreferences } from '../types';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { setTemporaryMessage } from '../store/slices/appSlice';
 
 // Chat service specific errors
 export class ChatServiceError extends Error {
@@ -17,18 +19,18 @@ export class ChatServiceError extends Error {
 }
 
 export class ChatService {
-  private messageService = messageService;
-  private relationshipService = relationshipService;
+  public messageService = messageService;
+//   private relationshipService = relationshipService;
   private messageQueue: Map<string, Promise<any>> = new Map();
-  private readonly MAX_RETRIES = 3;
-  private readonly RETRY_DELAYS = [1000, 2000, 4000];
+//   private readonly MAX_RETRIES = 3;
+//   private readonly RETRY_DELAYS = [1000, 2000, 4000];
 
-  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
-    const timeoutPromise = new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error('Request timed out')), timeoutMs);
-    });
-    return Promise.race([promise, timeoutPromise]);
-  }
+//   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
+//     const timeoutPromise = new Promise<T>((_, reject) => {
+//       setTimeout(() => reject(new Error('Request timed out')), timeoutMs);
+//     });
+//     return Promise.race([promise, timeoutPromise]);
+//   }
 
   private async processMessageQueue<T>(key: string, task: () => Promise<T>): Promise<T> {
     const currentTask = this.messageQueue.get(key) || Promise.resolve();
@@ -48,14 +50,15 @@ export class ChatService {
     relationshipId: string,
     content: string,
     relationship: Relationship,
-    user: User | null,
     preferences?: ChatPreferences,
     messageCount: number = 0,
     isPremium: boolean = false
-  ): Promise<{ userMessage: Message | null; aiResponse: Message | null; error: Error | null }> {
+  ): Promise<{ userMessage: Message | null; error: Error | null; dataStream: Response | undefined }> {
     return this.processMessageQueue(relationshipId, async () => {
       try {
         // Validate message content
+
+
         if (!content.trim()) {
           throw new ChatServiceError('Message content cannot be empty', 'empty_message');
         }
@@ -95,7 +98,7 @@ export class ChatService {
           content: content
         });
 
-        try {
+      
           // Call Supabase Edge Function
           const { data, error } = await supabase.functions.invoke('chat', {
             body: JSON.stringify({
@@ -108,31 +111,19 @@ export class ChatService {
           });
 
           if (error) throw error;
-          if (!data?.message) throw new Error('No response from AI');
 
-          // Save AI response
-          const { message: aiMessage, error: aiMessageError } = await this.messageService.createMessage(
-            relationshipId,
-            data.message,
-            true
-          );
+          
 
-          if (aiMessageError) throw aiMessageError;
-          if (!aiMessage) {
-            throw new ChatServiceError('Failed to create AI message', 'message_creation_failed');
-          }
+          return { userMessage, 
+            dataStream: data as Response,
+             error: null };
 
-          return { userMessage, aiResponse: aiMessage, error: null };
-
-        } catch (error) {
-          throw error;
-        }
-
+        
       } catch (error) {
         console.error('Send message error:', error);
         return {
           userMessage: null,
-          aiResponse: null,
+          dataStream: undefined,
           error: error instanceof ChatServiceError ? error : new ChatServiceError(
             'Failed to send message',
             'unknown_error',

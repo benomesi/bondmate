@@ -31,80 +31,85 @@ interface ChatRequest {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
-  try {
-    // Verify request method
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed');
+    // Handle CORS preflight requests
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', { headers: corsHeaders });
     }
 
-    // Get auth token from request
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
-    }
-
-    // Verify user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
-
-    if (authError || !user) {
-      throw new Error('Unauthorized');
-    }
-
-    // Get request body
-    const { messages, context, preferences, messageCount, isPremium }: ChatRequest = await req.json();
-
-    // Validate message limit for free users
-    if (!isPremium && messageCount >= 10) {
-      throw new Error('Message limit reached');
-    }
-
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: isPremium ? 'gpt-4-0125-preview' : 'gpt-3.5-turbo',
-      messages,
-      temperature: 0.7,
-      max_tokens: preferences.length === 'concise' ? 300 : 
-                 preferences.length === 'detailed' ? 2000 : 1000,
-      presence_penalty: 0.6,
-      frequency_penalty: 0.5
-    });
-
-    const response = completion.choices[0]?.message?.content;
-    if (!response) {
-      throw new Error('No response from OpenAI');
-    }
-
-    return new Response(
-      JSON.stringify({ message: response }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
+    try {
+        // Verify request method
+        if (req.method !== 'POST') {
+            throw new Error('Method not allowed');
         }
-      }
-    );
 
-  } catch (error) {
-    console.error('Chat error:', error);
-    
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An error occurred'
-      }),
-      { 
-        status: 400,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
+        // Get auth token from request
+        const authHeader = req.headers.get('Authorization');
+        if (!authHeader) {
+            throw new Error('Missing authorization header');
         }
-      }
-    );
-  }
+
+        // Verify user
+        const { data: { user }, error: authError } = await supabase.auth.getUser(
+            authHeader.replace('Bearer ', '')
+        );
+
+        if (authError || !user) {
+            throw new Error('Unauthorized');
+        }
+
+        // Get request body
+        const { messages, preferences, messageCount, isPremium }: ChatRequest = await req.json();
+
+        // Validate message limit for free users
+        if (!isPremium && messageCount >= 10) {
+            throw new Error('Message limit reached');
+        }
+
+        // Call OpenAI API with streaming
+        const completion = await openai.chat.completions.create({
+            model: isPremium ? 'gpt-4-0125-preview' : 'gpt-3.5-turbo',
+            messages,
+            temperature: 0.7,
+            max_tokens: preferences.length === 'concise' ? 300 : 
+                                 preferences.length === 'detailed' ? 2000 : 1000,
+            presence_penalty: 0.6,
+            frequency_penalty: 0.5,
+            stream: true
+        });
+
+        const readableStream = new ReadableStream({
+            async start(controller) {
+                const decoder = new TextDecoder();
+                const encoder = new TextEncoder();
+                for await (const chunk of completion.toReadableStream()) {
+                    const text = decoder.decode(chunk);
+                    controller.enqueue(encoder.encode(`data: ${text}\n\n`));
+                }
+                controller.close();
+            },
+        });
+
+        return new Response(readableStream, {
+            headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'text/event-stream'
+            }
+        });
+
+    } catch (error) {
+        console.error('Chat error:', error);
+        
+        return new Response(
+            JSON.stringify({ 
+                error: error instanceof Error ? error.message : 'An error occurred'
+            }),
+            { 
+                status: 400,
+                headers: {
+                    ...corsHeaders,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+    }
 });

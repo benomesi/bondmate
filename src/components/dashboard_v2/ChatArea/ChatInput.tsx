@@ -57,15 +57,16 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
 
     return (
         <>
-            <PreferencesModal 
-                isOpen={showPreferences}
-                onClose={() => setShowPreferences(false)}
-            />
-            <UpgradeModal
-                isOpen={isUpgradeModalOpen}
-                onClose={() => setIsUpgradeModalOpen(false)}
-            />
-            <div className="fixed bottom-0 md:left-[25%] right-0 bg-white border-t border-gray-200 chat-container w-screen md:w-auto -z-[10]">
+         <PreferencesModal 
+                    isOpen={showPreferences}
+                    onClose={() => setShowPreferences(false)}
+                />
+                <UpgradeModal
+                    isOpen={isUpgradeModalOpen}
+                    onClose={() => setIsUpgradeModalOpen(false)}
+                />
+            <div className="fixed bottom-0 lg:left-[25%] md:left-[34%] right-0 bg-white border-t border-gray-200 chat-container w-screen md:w-[66%] lg:w-auto -z-[10]">
+               
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 flex-col ">
@@ -75,7 +76,7 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
                                 title="Customize AI responses"
                             >
                                 <Settings className="w-5 h-5" />
-                                <span className="text-sm hidden sm:inline">Customize AI</span>
+                                <span className="text-sm hidden lg:inline">Customize AI</span>
                             </button>
                             {premiumRequired && (
                                 <button
@@ -83,7 +84,7 @@ export function ChatInput({ relationshipId }: { relationshipId: string }) {
                                     className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:opacity-90 transition-colors animate-pulse"
                                 >
                                     <Crown className="w-5 h-5 text-yellow-400" />
-                                    <span className="text-sm hidden sm:inline">Upgrade Now</span>
+                                    <span className="text-sm hidden lg:inline">Upgrade Now</span>
                                 </button>
                             )}
                         </div>

@@ -14,7 +14,7 @@ const RemainingMessages = () => {
             <span className="text-sm font-medium  dark:text-gray-300' text-gray-700">
                 Free Messages Remaining
             </span>
-            <span className="text-sm dark:text-gray-400' 'text-gray-500">
+            <span className="text-sm dark:text-gray-400 text-gray-500 text-nowrap">
                 {remainingMessages} / 10
             </span>
             </div>
