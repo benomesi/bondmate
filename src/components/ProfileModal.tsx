@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Plus, Crown } from 'lucide-react';
-import { useAppDispatch } from '../hooks/useAppDispatch';
-import { useAppSelector } from '../hooks/useAppSelector';
+import { X, Crown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { setProfile } from '../store/slices/appSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
 import { createSubscription } from '../lib/stripe';
 import type { User } from '../types';
+
+import { setProfile } from '../store/slices/appSlice';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -14,7 +16,7 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
-  const dispatch = useAppDispatch();
+const dispatch = useAppDispatch();
   const profile = useAppSelector((state) => state.app.profile);
   const { user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<User>(profile || {
@@ -29,11 +31,39 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [isUpgrading, setIsUpgrading] = useState(false);
 
   useEffect(() => {
-    if (isOpen && profile) {
+    if (profile) {
       setFormData(profile);
     }
-  }, [profile, isOpen]);
+    fetchProfile();
+  }, [profile, isOpen, user]);
 
+    const fetchProfile = async () => {
+        if (!user) return;
+        const { data, error } = await supabase
+        .from('profiles')
+        .select('name, is_admin, is_premium, interests, goals')
+        .eq('id', user.id)
+        .single();
+        if (error) {
+        console.error('Profile fetch error:', error);
+        setError('Failed to fetch profile');
+        } else {
+        setFormData(data);
+        }
+    }
+
+
+    const redirectToBillingPortal = async () => {
+        const { data, error } = await supabase.functions.invoke('billing-portal')
+        if (error) {
+        console.error('Billing portal error:', error);
+        setError('An error occurred. Please try again ');
+        return
+        }
+        const { url } = data;
+        // open the billing portal in a new tab
+        window.open(url, '_blank');
+    }
   const handleUpgrade = async () => {
     setIsUpgrading(true);
     try {
@@ -45,6 +75,34 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setIsUpgrading(false);
     }
   };
+
+
+  const updateProfile = async () => {
+    setIsLoading(true);
+    try {
+      const { data:_, error } = await supabase.from('profiles').update({
+        name: formData.name,
+      }).eq('id', user?.id)
+      if (error) {
+        console.error('Profile update error:', error);
+        setError('Failed to update profile');
+      } else {
+        if (profile) {
+        const payload = {
+            ...profile,
+            name: formData.name,
+        };
+        dispatch(setProfile(payload));
+        }
+        onClose();
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      setError('Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   if (!isOpen) return null;
 
@@ -114,18 +172,17 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               </div>
               {profile?.is_premium && (
                 <div className="mt-4 flex items-center justify-between">
-                  <a
-                    href="https://billing.stripe.com/p/login/test_28o5kq8Xf8Tn8Sc144"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={redirectToBillingPortal}
                     className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
                   >
                     Manage Subscription →
-                  </a>
+                  </button>
                   <button
                     type="button"
                     className="text-sm text-red-600 hover:text-red-700"
-                    onClick={() => {/* Add cancel subscription handler */}}
+                    onClick={redirectToBillingPortal}
                   >
                     Cancel Subscription
                   </button>
@@ -169,7 +226,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                 Cancel
               </button>
               <button
-                type="submit"
+                onClick={updateProfile}
                 disabled={isLoading}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:opacity-90"
               >

@@ -1,7 +1,11 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, Crown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/useAppSelector';
+import { useState } from 'react';
+import { createSubscription } from '../../lib/stripe';
+import { trackPricingInteraction } from '../../lib/analytics';
+import { SnackbarProvider, enqueueSnackbar as notify } from 'notistack';
 
 const PRICING_PLANS = [
   {
@@ -33,9 +37,54 @@ const PRICING_PLANS = [
 ];
 
 export function PricingSection() {
+
+    const navigate = useNavigate();
+    const profile = useAppSelector((state) => state.app.profile);
+    const [isUpgrading, setIsUpgrading] = useState(false);
+    
+
+    const handleUpgrade = async () => {
+        setIsUpgrading(true);
+        try {
+          await createSubscription(import.meta.env.VITE_PRICE_ID);
+        } catch (error) {
+            console.error('Upgrade error:', error);
+            
+            notify('Failed to start upgrade process', {
+                variant: 'error'
+            });
+
+        } finally {
+          setIsUpgrading(false);
+        }
+      };
+    
+
+      const handlePlanClick = (plan: Plan) => {
+        trackPricingInteraction(
+            'click',
+            plan.popular ? 'PREMIUM' : 'FREE',
+            { plan_name: plan.name }
+          )
+          if (!profile){
+            return navigate('/auth/sign-up');
+          }
+
+          if(!plan.popular){
+              return navigate('/dashboard');
+          }
+          return handleUpgrade();
+    }
+
   return (
     <section id="pricing" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SnackbarProvider
+             anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+        />
         <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -99,9 +148,10 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <Link
-                to="/auth/sign-up"
-                className={`block w-full py-3 text-center rounded-lg transition-colors ${
+              <button
+                disabled={isUpgrading || Boolean(profile && profile.is_premium && plan.popular)}
+                onClick={()=> handlePlanClick(plan)}
+                className={`block w-full py-3 text-center rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                   plan.popular
                     ? 'bg-white text-gray-900 hover:bg-gray-50'
                     : 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90'
@@ -110,12 +160,14 @@ export function PricingSection() {
                 {plan.popular ? (
                   <span className="flex items-center justify-center">
                     <Crown className="w-5 h-5 mr-2" />
-                    Start 14-Day Free Trial
+                    {
+                        isUpgrading ? 'Upgrading...' : 'Start 14-Day Free Trial'
+                    }
                   </span>
                 ) : (
                   'Start Your Journey - No Credit Card Required'
                 )}
-              </Link>
+              </button>
               {plan.popular && (
                 <p className="text-center mt-2 text-white/80 text-sm">
                   Try Premium free for 14 days. Cancel anytime.

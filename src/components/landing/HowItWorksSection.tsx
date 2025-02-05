@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, UserPlus, Target } from 'lucide-react';
 
@@ -57,9 +56,11 @@ export function HowItWorksSection() {
               <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center mx-auto mb-6">
                 <Icon className="w-8 h-8 text-blue-600" />
               </div>
-              <div className="absolute top-8 left-full w-full max-w-[100px] h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 hidden md:block" 
+              {
+                index !== 2 &&
+                <div className="absolute top-8 left-full w-full max-w-[100px] h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 hidden md:block" 
                 style={{ transform: 'translateX(-50%)' }}
-              />
+              />}
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 {title}
               </h3>

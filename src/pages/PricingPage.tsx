@@ -1,9 +1,12 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, Crown, MessageSquare, Brain, Target, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
 import { Footer } from '../components/Footer';
 import { trackPricingInteraction } from '../lib/analytics';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useState } from 'react';
+import { SnackbarProvider, enqueueSnackbar as notify } from 'notistack';
+import { createSubscription } from '../lib/stripe';
 
 const PRICING_PLANS = [
   {
@@ -95,10 +98,51 @@ const COMPARISON_FEATURES = [
   }
 ];
 
+
 export function PricingPage() {
+    const navigate = useNavigate();
+    const profile = useAppSelector((state) => state.app.profile);
+    const [isUpgrading, setIsUpgrading] = useState(false);
+
+    const handleUpgrade = async () => {
+        setIsUpgrading(true);
+        try {
+          await createSubscription(import.meta.env.VITE_PRICE_ID);
+        } catch (error) {
+          console.error('Upgrade error:', error);
+         notify('Failed to start upgrade process', { variant: 'error' });
+        } finally {
+          setIsUpgrading(false);
+        }
+    };
+
+    const handlePlanClick = (plan: Plan) => {
+        trackPricingInteraction(
+            'click',
+            plan.popular ? 'PREMIUM' : 'FREE',
+            { plan_name: plan.name }
+          )
+          if (!profile){
+            return navigate('/auth/sign-up');
+          }
+
+          if(!plan.popular){
+              return navigate('/dashboard');
+          }
+          return handleUpgrade();
+    }
+
+
+    
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+        <SnackbarProvider
+             anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+        />
         {/* Hero Section */}
         <section className="pt-32 pb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -168,14 +212,10 @@ export function PricingPage() {
                     ))}
                   </ul>
 
-                  <Link
-                    to="/auth/sign-up"
-                    onClick={() => trackPricingInteraction(
-                      'click',
-                      plan.popular ? 'PREMIUM' : 'FREE',
-                      { plan_name: plan.name }
-                    )}
-                    className={`block w-full py-3 text-center rounded-lg transition-colors ${
+                  <button
+                    disabled={isUpgrading || Boolean(profile && profile.is_premium && plan.popular)}
+                    onClick={() => handlePlanClick(plan)}
+                    className={`block w-full py-3 text-center rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                       plan.popular
                         ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:opacity-90'
                         : 'bg-white border-2 border-blue-500 text-blue-500 hover:bg-blue-50'
@@ -184,12 +224,17 @@ export function PricingPage() {
                     {plan.popular ? (
                       <span className="flex items-center justify-center">
                         <Crown className="w-5 h-5 mr-2" />
-                        Start 14-Day Free Trial
+                        
+                        {
+                            isUpgrading ? 'Starting Upgrade...' : 'Start 14-Day Free Trial'
+                        }
                       </span>
                     ) : (
                       'Get Started Free'
                     )}
-                  </Link>
+                  </button>
+
+
                   {plan.popular && (
                     <p className="text-center mt-2 text-gray-500 text-sm">
                       Try Premium free for 14 days. Cancel anytime.

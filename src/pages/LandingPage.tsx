@@ -1,6 +1,4 @@
-import React, { useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link} from 'react-router-dom';
 import { ArrowRight, Crown } from 'lucide-react';
 import { Footer } from '../components/Footer';
 import { StatsSection } from '../components/landing/StatsSection';
@@ -15,13 +13,6 @@ import { TrustSection } from '../components/landing/TrustSection';
 import { BlogSection } from '../components/landing/BlogSection';
 
 export function LandingPage() {
-  const navigate = useNavigate();
-
-  const handleGetStarted = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate('/dashboard');
-  };
-
   return (
     <>
       <div className="min-h-screen">

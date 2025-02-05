@@ -1,7 +1,7 @@
 [auth]
 enabled = true
-site_url = "https://your-production-domain.com"
-additional_redirect_urls = ["https://your-production-domain.com"]
+site_url = "https://bondmate-dev.netlify.app"
+additional_redirect_urls = ["https://bondmate-dev.netlify.app/dashboard"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10

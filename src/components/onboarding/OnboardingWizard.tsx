@@ -123,7 +123,7 @@ export function OnboardingWizard() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  className="w-24 h-24 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center"
+                  className="w-24 h-24 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl md:flex items-center justify-center hidden"
                 >
                   <Heart className="w-12 h-12 text-white" />
                 </motion.div>
@@ -141,7 +141,7 @@ export function OnboardingWizard() {
                   <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                     <User className="w-4 h-4 text-blue-600" />
                   </div>
-                  <div>
+                  <div className='flex flex-col items-start'>
                     <p className="text-gray-900 font-medium">Create Your Profile</p>
                     <p className="text-sm text-gray-600">Tell us about yourself</p>
                   </div>
@@ -151,7 +151,7 @@ export function OnboardingWizard() {
                   <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                     <Brain className="w-4 h-4 text-blue-600" />
                   </div>
-                  <div>
+                  <div className='flex flex-col items-start'>
                     <p className="text-gray-900 font-medium">Quick Assessment</p>
                     <p className="text-sm text-gray-600">Understand your relationship style</p>
                   </div>
@@ -161,7 +161,7 @@ export function OnboardingWizard() {
                   <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                     <Heart className="w-4 h-4 text-blue-600" />
                   </div>
-                  <div>
+                  <div className='flex flex-col items-start'>
                     <p className="text-gray-900 font-medium">Get Personalized Guidance</p>
                     <p className="text-sm text-gray-600">Start improving your relationships</p>
                   </div>

@@ -1,10 +1,8 @@
 import { supabase } from '../lib/supabase';
 import { encryptMessage,} from '../lib/encryption';
 import { messageService } from './messages';
-// import { relationshipService } from './relationships';
 import type { Message, Relationship, ChatPreferences } from '../types';
-import { useAppDispatch } from '../hooks/useAppDispatch';
-import { setTemporaryMessage } from '../store/slices/appSlice';
+
 
 // Chat service specific errors
 export class ChatServiceError extends Error {
@@ -20,18 +18,7 @@ export class ChatServiceError extends Error {
 
 export class ChatService {
   public messageService = messageService;
-//   private relationshipService = relationshipService;
   private messageQueue: Map<string, Promise<any>> = new Map();
-//   private readonly MAX_RETRIES = 3;
-//   private readonly RETRY_DELAYS = [1000, 2000, 4000];
-
-//   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 30000): Promise<T> {
-//     const timeoutPromise = new Promise<T>((_, reject) => {
-//       setTimeout(() => reject(new Error('Request timed out')), timeoutMs);
-//     });
-//     return Promise.race([promise, timeoutPromise]);
-//   }
-
   private async processMessageQueue<T>(key: string, task: () => Promise<T>): Promise<T> {
     const currentTask = this.messageQueue.get(key) || Promise.resolve();
     const newTask = currentTask.then(task, task);

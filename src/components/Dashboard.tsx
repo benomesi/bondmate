@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sidebar } from './dashboard/Sidebar';
 import { ChatArea } from './dashboard/ChatArea';
 import { EmptyState } from './dashboard/EmptyState';
