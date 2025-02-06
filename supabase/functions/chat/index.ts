@@ -31,24 +31,20 @@ interface ChatRequest {
 }
 
 Deno.serve(async (req) => {
-    // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders });
     }
 
     try {
-        // Verify request method
         if (req.method !== 'POST') {
             throw new Error('Method not allowed');
         }
 
-        // Get auth token from request
         const authHeader = req.headers.get('Authorization');
         if (!authHeader) {
             throw new Error('Missing authorization header');
         }
 
-        // Verify user
         const { data: { user }, error: authError } = await supabase.auth.getUser(
             authHeader.replace('Bearer ', '')
         );
@@ -57,21 +53,20 @@ Deno.serve(async (req) => {
             throw new Error('Unauthorized');
         }
 
-        // Get request body
-        const { messages, preferences, messageCount, isPremium }: ChatRequest = await req.json();
-
-        // Validate message limit for free users
+        const { messages, context, preferences, messageCount, isPremium }: ChatRequest = await req.json();
         if (!isPremium && messageCount >= 10) {
             throw new Error('Message limit reached');
         }
 
-        // Call OpenAI API with streaming
+        const systemPrompt = generateSystemPrompt(context, preferences);
+        messages.unshift({ role: 'system', content: systemPrompt });
+
         const completion = await openai.chat.completions.create({
             model: isPremium ? 'gpt-4-0125-preview' : 'gpt-3.5-turbo',
             messages,
             temperature: 0.7,
             max_tokens: preferences.length === 'concise' ? 300 : 
-                                 preferences.length === 'detailed' ? 2000 : 1000,
+            preferences.length === 'detailed' ? 2000 : 1000,
             presence_penalty: 0.6,
             frequency_penalty: 0.5,
             stream: true
@@ -113,3 +108,31 @@ Deno.serve(async (req) => {
         );
     }
 });
+
+function generateSystemPrompt(relationship, preferences) {
+    return `You are an expert dating coach focused on helping with dating advice. Your responses should feel like talking to a knowledgeable friend who genuinely wants to help.
+  
+  Response Format:
+  1. Brief Welcome (1 line)
+     "I understand [their situation/concern]..."
+  
+  2. Key Points (2-3 sections)
+     Each section should be formatted as:
+     **[Section Title]**
+     • Point 1 with specific detail
+     • Point 2 with clear action
+     • Point 3 with expected outcome
+  
+  3. Follow-up Question (1 line)
+     Always end with a question to encourage continued dialogue.
+  
+  Context:
+  - User Type: ${relationship.type}
+  - Interests: ${relationship.interests.join(", ")}
+  - Goals: ${relationship.goals.join(", ")}
+  
+  Preferences:
+  - Tone: ${preferences?.tone || "empathetic"}
+  - Length: ${preferences?.length || "balanced"}
+  - Style: ${preferences?.style || "supportive"}`;
+}

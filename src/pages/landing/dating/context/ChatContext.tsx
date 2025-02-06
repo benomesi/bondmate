@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { getChatResponse } from '../../../../lib/openai';
+import { getServerChatResponse } from '../../../../lib/openai';
 import type { ChatPreferences } from '../../../../types';
 
 interface Message {
@@ -168,8 +168,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         content: content.trim()
       });
 
+      
+     
+      
       // Get AI response
-      const response = await getChatResponse(
+      const response = await getServerChatResponse(
         formattedMessages,
         DEMO_CONTEXT,
         null,

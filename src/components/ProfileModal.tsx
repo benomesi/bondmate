@@ -17,7 +17,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 const dispatch = useAppDispatch();
-  const profile = useAppSelector((state) => state.app.profile);
+  const {profile, billingDate} = useAppSelector((state) => state.app);
   const { user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<User>(profile || {
     name: '',
@@ -152,7 +152,8 @@ const dispatch = useAppDispatch();
                           <span className="font-medium">Price:</span> $20/month
                         </p>
                         <p className="text-sm text-gray-600">
-                          <span className="font-medium">Next billing date:</span> {/* Add billing date from Stripe */}
+                          <span className="font-medium">Next billing date: </span> 
+                            {billingDate? new Date(billingDate).toLocaleDateString() : 'N/A'}
                         </p>
                       </>
                     )}

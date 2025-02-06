@@ -81,7 +81,7 @@ const FullscreenChat = ({ onClose }: FullscreenChatProps) => {
                 >
                   <div 
                     className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: marked(message.content) }}
+                    dangerouslySetInnerHTML={{ __html: marked(message.content) as string }}
                   />
                 </div>
               </motion.div>
@@ -330,7 +330,7 @@ export function SimpleChatSection() {
                       >
                         <div 
                           className="prose prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ __html: marked(message.content) }}
+                          dangerouslySetInnerHTML={{ __html: marked(message.content) as string }}
                         />
                       </div>
                     </motion.div>

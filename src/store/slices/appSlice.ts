@@ -16,6 +16,7 @@ interface AppState {
   quizResults: QuizResults | null;
   chatPreferences: ChatPreferences;
   temporaryMessage?: Message;
+billingDate: string | null;
 }
 
 const initialState: AppState = {
@@ -36,7 +37,8 @@ const initialState: AppState = {
     length: 'concise' as const,
     style: 'supportive' as const
   },
-  temporaryMessage: undefined
+  temporaryMessage: undefined,
+  billingDate: null
 };
 
 // const FREE_MESSAGE_LIMIT = 10;
@@ -141,7 +143,11 @@ export const appSlice = createSlice({
     },
     setTemporaryMessage: (state, action: PayloadAction<Message | undefined>) => {
       state.temporaryMessage = action.payload;
+    },
+    setBillingDate: (state, action: PayloadAction<string | null>) => {
+      state.billingDate = action.payload;
     }
+
 }
 });
 
@@ -162,7 +168,8 @@ export const {
   setHasCompletedOnboarding,
   setQuizResults,
   setChatPreferences,
-    setTemporaryMessage
+  setTemporaryMessage,
+  setBillingDate
 } = appSlice.actions;
 
 export default appSlice.reducer;

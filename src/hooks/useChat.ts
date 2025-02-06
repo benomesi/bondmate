@@ -72,7 +72,6 @@ export function useChat(relationshipId: string) {
                 if (!reader) break;
               const { done, value } = await reader.read();
               if (done) {
-                dispatch(setTemporaryMessage(undefined));        
                 break;
             }
           
@@ -114,6 +113,8 @@ export function useChat(relationshipId: string) {
 
       if (aiResponse) {
         dispatch(addMessage({ relationshipId, message: aiResponse }));
+        dispatch(setTemporaryMessage(undefined));        
+
       }
 
     } catch (error) {

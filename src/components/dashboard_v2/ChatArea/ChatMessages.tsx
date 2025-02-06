@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { marked } from 'marked';
 import { useChat } from '../../../hooks/useChat';
 import { endChatSession, startChatSession } from '../../../lib/analytics';
 import { useAppSelector } from '../../../hooks/useAppSelector';
 import scrollIntoView from 'scroll-into-view-if-needed'
-
 
 interface MessageProps {
     message: {
@@ -18,12 +17,9 @@ interface MessageProps {
 function Message({ message }: MessageProps) {
     const aiClass = message.id === 'error' ? 'border-red-300 border bg-white text-gray-700 shadow-sm w-full' : 'bg-white text-gray-700 shadow-sm border border-gray-100' 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+        <div
             className={`flex ${message.isAI ? 'justify-start' : 'justify-end'} mb-2`}
-            layout
+            // layout
         >
             <div
                 className={`max-w-[85%] rounded-xl p-4 ${
@@ -39,7 +35,7 @@ function Message({ message }: MessageProps) {
                     }}
                 />
             </div>
-        </motion.div>
+        </div>
     );
 }
 
