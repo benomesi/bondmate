@@ -18,11 +18,11 @@ export const AuthUserDetails = () => {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
             dispatch(clearAuth());
-            navigate('/auth/sign-in');
+            navigate('/sign-in');
         } catch (error) {
             console.error('Sign out error:', error);
             dispatch(clearAuth());
-            navigate('/auth/sign-in');
+            navigate('/sign-in');
         }
     };
 

@@ -67,7 +67,7 @@ export function PricingSection() {
             { plan_name: plan.name }
           )
           if (!profile){
-            return navigate('/auth/sign-up');
+            return navigate('/sign-up');
           }
 
           if(!plan.popular){

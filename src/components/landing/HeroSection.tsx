@@ -38,7 +38,7 @@ export function HeroSection() {
             className="flex flex-col sm:flex-row justify-center items-center gap-4"
           >
             <Link
-              to="/auth/sign-up"
+              to="/sign-up"
               className="px-8 py-3 text-lg font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center group animate-bounce"
             >
               Start Your Journey Today

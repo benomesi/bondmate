@@ -44,27 +44,27 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
   };
 
   const renderWelcomeContent = () => (
-    <div className="text-center space-y-6 max-w-2xl mx-auto">
+    <div className="text-center space-y-4 max-w-2xl mx-auto text-sm md:text-md">
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
       >
         <X className="w-5 h-5" />
       </button>
-      <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-        <Users className="w-10 h-10 text-white" />
+      <div className="md:w-16 md:h-16 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <Users className="w-6 h-6 text-white" />
       </div>
-      <h2 className="text-3xl font-bold text-gray-900">
+      <h2 className="text-lg md:text-2xl font-bold text-gray-900">
         {relationships.length === 0 ? "Let's Add Your First Relationship" : "Add a New Relationship"}
       </h2>
-      <p className="text-xl text-gray-600">
+      <p className="md:text-md text-gray-600">
         {relationships.length === 0 
           ? "BondMate helps you strengthen your relationships through personalized AI guidance. Start by telling us about someone important in your life - it could be a romantic partner, family member, friend, or professional connection."
           : "Tell us about someone important in your life that you'd like to strengthen your relationship with."}
       </p>
-      <div className="bg-blue-50 p-6 rounded-xl text-left">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">What to expect:</h3>
-        <ul className="space-y-3 text-blue-800">
+      <div className="bg-blue-50 p-4 rounded-xl text-left">
+        <h3 className="md:text-lg font-semibold text-blue-900 mb-3">What to expect:</h3>
+        <ul className="space-y-2 text-blue-800">
           <li className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
             <span>Quick 3-step setup process</span>
@@ -163,7 +163,7 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
       case 1:
         return true; // Welcome screen is always valid
       case 2:
-        return data.name.trim().length > 0 && data.type !== '';
+        return data.name.trim().length > 0;
       case 3:
         return data.communicationStyle !== '';
       case 4:
@@ -179,11 +179,11 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-2xl  rounded-2xl shadow-xl relative max-h-[90%] md:max-h-[100%] overflow-y-auto bg-white"
+        className="w-full max-w-2xl  rounded-2xl shadow-xl relative max-h-[95%] md:max-h-[100%] overflow-y-auto bg-white"
       >
         {/* Progress Bar */}
-        <div className="p-6 border-b border-gray-200  rounded-t-2xl">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-4 border-b border-gray-200  rounded-t-2xl">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-medium text-gray-600">
               {step === 1 ? 'Welcome' : `Step ${step - 1} of 3`}
             </span>
@@ -206,7 +206,7 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
         )}
 
         {/* Content Area */}
-        <div className="p-6">
+        <div className="px-6 p-2">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
@@ -364,7 +364,7 @@ export function RelationshipWizard({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Actions */}
-        <div className="sticky bottom-0 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+        <div className="sticky bottom-0 px-6 p-3 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <div className="flex justify-between items-center">
             <button
               onClick={handleBack}

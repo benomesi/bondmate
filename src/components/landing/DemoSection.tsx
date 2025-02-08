@@ -219,7 +219,7 @@ export function DemoSection() {
                   Ready to get personalized guidance?
                 </p>
                 <Link
-                  to="/auth/sign-up"
+                  to="/sign-up"
                   className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 group whitespace-nowrap"
                 >
                   Transform Your Relationships

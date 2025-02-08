@@ -363,7 +363,7 @@ export function SimpleChatSection() {
                       Ready to unlock unlimited coaching? Get personalized guidance for all your dating needs.
                     </p>
                     <Link
-                      to="/auth/sign-up"
+                      to="/sign-up"
                       className="inline-block px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:opacity-90 transition-colors"
                     >
                       Start Free Trial

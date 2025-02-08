@@ -50,8 +50,8 @@ export function handleAuthError(
     dispatch(clearAuth());
     
     // Only navigate to sign-in if we're not already there
-    if (!window.location.pathname.includes('/auth/sign-in')) {
-      navigate('/auth/sign-in', { 
+    if (!window.location.pathname.includes('/sign-in')) {
+      navigate('/sign-in', { 
         state: { from: window.location.pathname }
       });
     }

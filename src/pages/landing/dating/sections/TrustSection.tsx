@@ -111,7 +111,7 @@ export function TrustSection() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                to="/auth/sign-up"
+                to="/sign-up"
                 className="px-8 py-4 bg-white text-red-600 rounded-xl hover:bg-gray-50 transition-colors font-bold text-lg flex items-center group"
               >
                 Start Free Trial

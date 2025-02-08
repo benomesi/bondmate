@@ -38,7 +38,7 @@ export function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link
-                to="/auth/sign-up"
+                to="/sign-up"
                 className="px-8 py-3 text-lg font-medium bg-white text-gray-900 rounded-full hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center"
               >
                 Get Started Free

@@ -8,7 +8,7 @@
    {
 @@ .. @@
                <Link
-                 to="/auth/sign-up"
+                 to="/sign-up"
                  className={`block w-full py-3 text-center rounded-lg transition-colors ${
                    plan.popular
                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90'

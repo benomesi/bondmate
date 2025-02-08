@@ -26,7 +26,7 @@ export default function App() {
 //   const { hasCompletedOnboarding } = useAppSelector((state) => state.app);
   const { user } = useAppSelector((state) => state.auth);
   const {pathname} = useLocation()
-console.log(pathname)
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white">
@@ -46,11 +46,11 @@ console.log(pathname)
             
             {/* Auth routes */}
             <Route 
-              path="/auth/sign-in" 
+              path="/sign-in" 
               element={user ? <Navigate to="/dashboard" replace /> : <SignInPage />} 
             />
             <Route 
-              path="/auth/sign-up" 
+              path="/sign-up" 
               element={user ? <Navigate to="/dashboard" replace /> : <SignUpPage />}
             />
             
@@ -104,7 +104,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth/sign-in" state={{ from: location }} replace />;
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

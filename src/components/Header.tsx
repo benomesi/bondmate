@@ -64,7 +64,7 @@ export function Header() {
                 Pricing
               </button>
               <Link
-                to="/auth/sign-up"
+                to="/sign-up"
                 className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm font-medium flex items-center"
               >
                 Start Free Trial
@@ -123,7 +123,7 @@ export function Header() {
               </Link>
             ) : (
               <Link
-                to="/auth/sign-up"
+                to="/sign-up"
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:opacity-90 transition-colors flex items-center"
               >
                 Get Started

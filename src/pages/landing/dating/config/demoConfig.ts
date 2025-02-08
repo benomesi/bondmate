@@ -73,5 +73,5 @@ Formatting Rules:
 export const DATING_SIGNUP_CTA = {
   text: "Ready to dive deeper? Get personalized guidance for your dating journey",
   buttonText: "Start Free Trial",
-  path: "/auth/sign-up"
+  path: "/sign-up"
 };

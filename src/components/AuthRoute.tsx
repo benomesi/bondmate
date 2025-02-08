@@ -16,7 +16,7 @@ export function AuthRoute({ children }: AuthRouteProps) {
   }
 
   if (!user) {
-    return <Navigate to="/auth/sign-in" state={{ from: location }} replace />;
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

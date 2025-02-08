@@ -48,7 +48,7 @@ export function DatingStatsSection() {
           className="text-center"
         >
           <Link
-            to="/auth/sign-up"
+            to="/sign-up"
             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-medium group"
           >
             Let BondMate Fix This For You

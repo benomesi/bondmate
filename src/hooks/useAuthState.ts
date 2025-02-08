@@ -76,32 +76,31 @@ export function useAuthState() {
             dispatch(setHasCompletedOnboarding(profile.has_completed_onboarding || false));
             dispatch(setPremium(profile.is_premium || false));
           }
-
-            const { data: profileData, error: profileDataError } = await supabase
-                .from('profiles')
-                .select('next_billing_date')
-                .eq('id', session.user.id)
-                .single();
-            if (profileDataError) {
-                throw profileDataError;
-            }
-            let billingDate = profileData?.next_billing_date;
-            
-            if (!billingDate || new Date() > new Date(billingDate)) {
-                // fetch next billing date from edge function
-            const { data: nextBillingDate, error: _} = await supabase.functions.invoke('billing-date')
-                console.log({nextBillingDate});
-                if(nextBillingDate){
-                     // update the next_billing_date column in the profiles table 
-                      await supabase.from('profiles').update({ next_billing_date: nextBillingDate.next_billing_date })
-                     .eq('id', session.user.id)
+            if (profile && isSubscribed) {
+                const { data: profileData, error: profileDataError } = await supabase
+                    .from('profiles')
+                    .select('next_billing_date')
+                    .eq('id', session.user.id)
+                    .single();
+                if (profileDataError) {
+                    throw profileDataError;
                 }
-                dispatch(setBillingDate(nextBillingDate.next_billing_date));
-            }else{
-                dispatch(setBillingDate(profileData.next_billing_date));
+                let billingDate = profileData?.next_billing_date;
+                
+                if (!billingDate || new Date() > new Date(billingDate)) {
+                    // fetch next billing date from edge function
+                const { data: nextBillingDate, error: _} = await supabase.functions.invoke('billing-date')
+                    console.log({nextBillingDate});
+                    if(nextBillingDate){
+                        // update the next_billing_date column in the profiles table 
+                        await supabase.from('profiles').update({ next_billing_date: nextBillingDate.next_billing_date })
+                        .eq('id', session.user.id)
+                        dispatch(setBillingDate(nextBillingDate.next_billing_date));
+                    }
+                }else{
+                    dispatch(setBillingDate(profileData?.next_billing_date));
+                }
             }
-
-
 
           // Fetch relationships and messages
           try {
