@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Crown, Loader } from 'lucide-react';
 import { createSubscription } from '../lib/stripe';
 import { trackPricingInteraction } from '../lib/analytics';
-
+import { useNavigate} from 'react-router-dom';
 interface SubscriptionButtonProps {
   priceId: string;
   planName: string;
@@ -19,7 +19,7 @@ export function SubscriptionButton({
 }: SubscriptionButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+    const navigate = useNavigate();
   const handleSubscribe = async () => {
     setIsLoading(true);
     setError(null);
@@ -30,7 +30,9 @@ export function SubscriptionButton({
         plan_name: planName,
         price_id: priceId
       });
-
+      if (!priceId.startsWith('price_')) {
+        return navigate('/dashboard');
+      }
       await createSubscription(priceId);
     } catch (err) {
       console.error('Subscription error:', err);

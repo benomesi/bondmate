@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { PricingCard } from '../pricing/PricingCard';
 import { PRICING_PLANS } from '../pricing';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { DatingHeroSection } from './sections/DatingHeroSection';
 import { HowItWorksSection } from './sections/HowItWorksSection';
 import { SimpleChatSection } from './sections/SimpleChatSection';
